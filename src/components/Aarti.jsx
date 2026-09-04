@@ -70,8 +70,8 @@ export default function Aarti({ onBack }) {
     <div className="screen aarti-screen">
       <div className="topbar">
         {deity ? (
-          <button className="back-btn" onClick={() => setDeityId(null)}>
-            ← {t('aarti.backDeities')}
+          <button className="back-btn" onClick={() => (aarti ? setAartiId(null) : setDeityId(null))}>
+            ← {aarti ? t('aarti.backList') : t('aarti.backDeities')}
           </button>
         ) : (
           <button className="back-btn" onClick={onBack}>
@@ -87,7 +87,7 @@ export default function Aarti({ onBack }) {
           <p className="screen-subtitle">{t('aarti.subtitle')}</p>
           <div className="aarti-deities">
             {data.deities.map((d) => (
-              <button key={d.id} className="deity-card" onClick={() => setDeityId(d.id)}>
+              <button key={d.id} className="deity-card" onClick={() => { setAartiId(null); setDeityId(d.id) }}>
                 <span className="deity-emoji">{d.emoji}</span>
                 <span className="deity-name">{d.name}</span>
                 <span className="deity-name-en">{d.nameEn}</span>
@@ -125,7 +125,7 @@ export default function Aarti({ onBack }) {
       {deity && aarti && (
         <div className="lyric-view">
           <p className="aarti-subtitle">
-            {deity.name} · {LANGS[a.lang] || a.lang}
+            {deity.name} · {LANGS[aarti.lang] || aarti.lang}
           </p>
           <div className="lyric-lines">
             {aarti.lines.map((line, i) =>

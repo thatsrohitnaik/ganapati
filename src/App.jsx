@@ -4,6 +4,7 @@ import { I18nProvider } from './i18n'
 import Home from './components/Home'
 import Quiz from './components/Quiz'
 import Aarti from './components/Aarti'
+import Japa from './components/Japa'
 import SinglistScreen from './components/SinglistScreen'
 import SettingsScreen from './components/SettingsScreen'
 import { decodeSinglist, importSinglist, setActiveSinglistId } from './utils/singlists'
@@ -42,6 +43,7 @@ export default function App() {
       {toast && <div className="toast">{toast}</div>}
       {view === 'quiz' && <Quiz onBack={() => setView('home')} />}
       {view === 'aarti' && <Aarti onBack={() => setView('home')} />}
+      {view === 'japa' && <Japa onBack={() => setView('home')} />}
       {view === 'singlist' && <SinglistScreen onBack={() => setView('home')} />}
       {view === 'settings' && <SettingsScreen onBack={() => setView('home')} />}
       {view === 'home' && <Home onSelect={setView} />}

@@ -1,0 +1,24 @@
+{
+  "mantras": [
+    { "id": "ganapati-om-gum", "deityId": "ganapati", "title": "ॐ गं गणपतये नमः", "titleEn": "Om Gam Ganapataye Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ गं गणपतये नमः"] },
+    { "id": "ganapati-gayatri", "deityId": "ganapati", "title": "गणेश गायत्री", "titleEn": "Ganesh Gayatri", "lang": "sa", "defaultTarget": 108, "text": ["ॐ एकदंताय विद्महे", "वक्रतुंडाय धीमहि", "तन्नो दन्तिः प्रचोदयात्"] },
+    { "id": "shankar-om-namah", "deityId": "shankar", "title": "ॐ नमः शिवाय", "titleEn": "Om Namah Shivaya", "lang": "sa", "defaultTarget": 108, "text": ["ॐ नमः शिवाय"] },
+    { "id": "shankar-mrityunjaya", "deityId": "shankar", "title": "महामृत्युंजय मंत्र", "titleEn": "Maha Mrityunjaya", "lang": "sa", "defaultTarget": 108, "text": ["ॐ त्र्यंबकं यजामहे", "सुगंधिं पुष्टिवर्धनम्", "उर्वारुकमिव बंधनान्", "मृत्योर्मुक्षीय मामृतात्"] },
+    { "id": "ram-rama", "deityId": "ram", "title": "ॐ श्री रामाय नमः", "titleEn": "Om Shri Ramaya Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ श्री रामाय नमः"] },
+    { "id": "ram-jaya", "deityId": "ram", "title": "श्री राम जय राम", "titleEn": "Shri Ram Jai Ram", "lang": "mr", "defaultTarget": 108, "text": ["श्री राम जय राम", "जय जय राम"] },
+    { "id": "krishna-namah", "deityId": "krishna", "title": "ॐ नमो भगवते वासुदेवाय", "titleEn": "Om Namo Bhagavate Vasudevaya", "lang": "sa", "defaultTarget": 108, "text": ["ॐ नमो भगवते वासुदेवाय"] },
+    { "id": "krishna-hare", "deityId": "krishna", "title": "हरे कृष्ण महामंत्र", "titleEn": "Hare Krishna Maha-mantra", "lang": "sa", "defaultTarget": 108, "text": ["हरे कृष्ण हरे कृष्ण", "कृष्ण कृष्ण हरे हरे", "हरे राम हरे राम", "राम राम हरे हरे"] },
+    { "id": "hanuman-han", "deityId": "hanuman", "title": "ॐ हनुमते नमः", "titleEn": "Om Hanumate Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ हनुमते नमः"] },
+    { "id": "hanuman-gayatri", "deityId": "hanuman", "title": "हनुमान गायत्री", "titleEn": "Hanuman Gayatri", "lang": "sa", "defaultTarget": 108, "text": ["ॐ आंजनेयाय विद्महे", "वायुपुत्राय धीमहि", "तन्नो हनुमत् प्रचोदयात्"] },
+    { "id": "datta-dram", "deityId": "datta", "title": "ॐ द्रां दत्तात्रेयाय नमः", "titleEn": "Om Dram Dattatreyaaya Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ द्रां दत्तात्रेयाय नमः"] },
+    { "id": "datta-bhagavate", "deityId": "datta", "title": "ॐ नमो भगवते दत्तात्रेयाय", "titleEn": "Om Namo Bhagavate Dattatreyaaya", "lang": "sa", "defaultTarget": 108, "text": ["ॐ नमो भगवते दत्तात्रेयाय"] },
+    { "id": "viththal-vithala", "deityId": "viththal", "title": "ॐ श्री विठ्ठलाय नमः", "titleEn": "Om Shri Vitthalaya Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ श्री विठ्ठलाय नमः"] },
+    { "id": "vishnu-namo", "deityId": "vishnu", "title": "ॐ नमो नारायणाय", "titleEn": "Om Namo Narayanaya", "lang": "sa", "defaultTarget": 108, "text": ["ॐ नमो नारायणाय"] },
+    { "id": "vishnu-vishnave", "deityId": "vishnu", "title": "ॐ विष्णवे नमः", "titleEn": "Om Vishnave Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ विष्णवे नमः"] },
+    { "id": "durga-dum", "deityId": "durga", "title": "ॐ दुं दुर्गायै नमः", "titleEn": "Om Dum Durgayai Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ दुं दुर्गायै नमः"] },
+    { "id": "durga-chamunda", "deityId": "durga", "title": "ॐ ऐं ह्रीं क्लीं चामुण्डायै विच्चे", "titleEn": "Om Aim Hrim Klim Chamundayai Vichche", "lang": "sa", "defaultTarget": 108, "text": ["ॐ ऐं ह्रीं क्लीं चामुण्डायै विच्चे"] },
+    { "id": "laxmi-shrim", "deityId": "laxmi", "title": "ॐ श्रीं महालक्ष्म्यै नमः", "titleEn": "Om Shrim Mahalakshmyai Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ श्रीं महालक्ष्म्यै नमः"] },
+    { "id": "laxmi-hrim", "deityId": "laxmi", "title": "ॐ ह्रीं श्रीं लक्ष्मीभ्यो नमः", "titleEn": "Om Hrim Shrim Lakshmibhyo Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ ह्रीं श्रीं लक्ष्मीभ्यो नमः"] },
+    { "id": "santoshi-mata", "deityId": "santoshi", "title": "ॐ संतोषी मातायै नमः", "titleEn": "Om Santoshi Maatayai Namaha", "lang": "sa", "defaultTarget": 108, "text": ["ॐ संतोषी मातायै नमः"] }
+  ]
+}

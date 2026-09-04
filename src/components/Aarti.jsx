@@ -20,6 +20,7 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
   const [newName, setNewName] = useState('')
   const [notice, setNotice] = useState(null)
   const [shareMsg, setShareMsg] = useState(null)
+  const [shareOpen, setShareOpen] = useState(false)
 
   const deity = data.deities.find((d) => d.id === deityId)
   const aarti = deity?.aartis.find((a) => a.id === aartiId)
@@ -65,12 +66,18 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
 
   const activeId = getActiveSinglistId()
 
+  function shareUrl() {
+    return window.location.origin + window.location.pathname + `#/aarti/${deity.id}/${aarti.id}`
+  }
+
   function share() {
-    const url = window.location.origin + window.location.pathname + `#/aarti/${deity.id}/${aarti.id}`
-    const text = `${deity.name} · ${aarti.title} — Ganpati Bappa Morya 🙏`
-    if (navigator.share) {
-      navigator.share({ title: aarti.title, text, url }).catch(() => {})
-    } else if (navigator.clipboard) {
+    setShareOpen(true)
+  }
+
+  function copyLink() {
+    const url = shareUrl()
+    setShareOpen(false)
+    if (navigator.clipboard) {
       navigator.clipboard
         .writeText(url)
         .then(() => {
@@ -80,6 +87,24 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
         .catch(() => {})
     } else {
       window.prompt(t('sing.copyLink'), url)
+    }
+  }
+
+  function shareWhatsApp() {
+    const url = shareUrl()
+    const text = `${deity.name} · ${aarti.title} — Ganpati Bappa Morya 🙏\n${url}`
+    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank')
+    setShareOpen(false)
+  }
+
+  function shareNative() {
+    const url = shareUrl()
+    const text = `${deity.name} · ${aarti.title} — Ganpati Bappa Morya 🙏`
+    if (navigator.share) {
+      navigator.share({ title: aarti.title, text, url }).catch(() => {})
+      setShareOpen(false)
+    } else {
+      copyLink()
     }
   }
 
@@ -216,6 +241,32 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
                 {t('sing.newSinglist')} ＋
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {shareOpen && (
+        <div className="chooser-overlay" onClick={() => setShareOpen(false)}>
+          <div className="chooser share-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="chooser-head">
+              <h3>📤 {t('aarti.shareTitle')}</h3>
+              <button className="chooser-close" onClick={() => setShareOpen(false)}>✕</button>
+            </div>
+            <p className="share-url">{shareUrl()}</p>
+            <div className="share-actions">
+              <button className="btn-primary share-wa" onClick={shareWhatsApp}>
+                💬 {t('aarti.shareWhatsapp')}
+              </button>
+              <button className="btn-secondary share-copy" onClick={copyLink}>
+                🔗 {t('aarti.copyLink')}
+              </button>
+              {navigator.share && (
+                <button className="btn-secondary share-more" onClick={shareNative}>
+                  📲 {t('aarti.shareMore')}
+                </button>
+              )}
+            </div>
+            {shareMsg && <p className="chooser-notice">{shareMsg}</p>}
           </div>
         </div>
       )}

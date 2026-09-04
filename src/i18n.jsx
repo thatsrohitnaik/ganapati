@@ -65,6 +65,10 @@ const T = {
       activeBadge: 'Active',
       manageLists: 'Manage lists',
       share: 'Share this aarti',
+      shareTitle: 'Share this aarti',
+      shareWhatsapp: 'WhatsApp',
+      shareMore: 'More options',
+      copyLink: 'Copy Link',
     },
     sing: {
       addToWhich: 'Add to which singlist?',
@@ -193,6 +197,10 @@ const T = {
       activeBadge: 'अॅक्टिव्ह',
       manageLists: 'सिंगलिस्ट व्यवस्थापित करा',
       share: 'ही आरती शेअर करा',
+      shareTitle: 'ही आरती शेअर करा',
+      shareWhatsapp: 'व्हॉट्सॲप',
+      shareMore: 'अधिक पर्याय',
+      copyLink: 'लिंक कॉपी करा',
     },
     sing: {
       title: 'सिंगलिस्ट',
@@ -317,6 +325,10 @@ const T = {
       activeBadge: 'सक्रिय',
       manageLists: 'सिंगलिस्ट प्रबंधित करें',
       share: 'इस आरती को शेयर करें',
+      shareTitle: 'इस आरती को शेयर करें',
+      shareWhatsapp: 'व्हाट्सएप',
+      shareMore: 'और विकल्प',
+      copyLink: 'लिंक कॉपी करें',
     },
     sing: {
       title: 'सिंगलिस्ट',
@@ -441,6 +453,10 @@ const T = {
       activeBadge: 'सक्रीय',
       manageLists: 'सिंगलिस्ट व्यवस्थापित करात',
       share: 'ही आरती शेअर करात',
+      shareTitle: 'ही आरती शेअर करात',
+      shareWhatsapp: 'व्हॉट्सॲप',
+      shareMore: 'आनीक पर्याय',
+      copyLink: 'लिंक कॉपी करात',
     },
     sing: {
       title: 'सिंगलिस्ट',

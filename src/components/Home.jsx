@@ -4,9 +4,9 @@ export default function Home({ onSelect }) {
   const { lang, setLang, t } = useI18n()
 
   const cards = [
-    { id: 'quiz', emoji: '🏆', title: t('home.quiz.title'), desc: t('home.quiz.desc') },
     { id: 'aarti', emoji: '🪔', title: t('home.aarti.title'), desc: t('home.aarti.desc') },
     { id: 'singlist', emoji: '🎶', title: t('home.singlist.title'), desc: t('home.singlist.desc') },
+    { id: 'quiz', emoji: '🏆', title: t('home.quiz.title'), desc: t('home.quiz.desc') },
     { id: 'japa', emoji: '📿', title: t('home.japa.title'), desc: t('home.japa.desc') },
     { id: 'settings', emoji: '⚙️', title: t('home.settings.title'), desc: t('home.settings.desc') },
   ]

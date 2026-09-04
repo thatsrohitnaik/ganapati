@@ -38,6 +38,20 @@
   color: var(--white);
 }
 
+.share-btn {
+  background: transparent;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--saffron);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.share-btn:hover {
+  background: var(--saffron);
+}
+
 .screen-subtitle {
   color: var(--ink-soft);
   text-align: center;
@@ -697,6 +711,19 @@
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 20px;
+}
+
+.aarti-share-msg {
+  text-align: center;
+  color: var(--maroon-dark);
+  font-weight: 600;
+  font-size: 13px;
+  background: #fff2e6;
+  border: 1px solid var(--saffron);
+  border-radius: 999px;
+  padding: 6px 14px;
+  margin: 0 auto 16px;
+  max-width: fit-content;
 }
 
 .lyric-lines {

@@ -64,6 +64,7 @@ const T = {
       removedFrom: 'Removed from {name}',
       activeBadge: 'Active',
       manageLists: 'Manage lists',
+      share: 'Share this aarti',
     },
     sing: {
       addToWhich: 'Add to which singlist?',
@@ -191,6 +192,7 @@ const T = {
       removedFrom: '{name} मधून काढली',
       activeBadge: 'अॅक्टिव्ह',
       manageLists: 'सिंगलिस्ट व्यवस्थापित करा',
+      share: 'ही आरती शेअर करा',
     },
     sing: {
       title: 'सिंगलिस्ट',
@@ -314,6 +316,7 @@ const T = {
       removedFrom: '{name} से हटाया गया',
       activeBadge: 'सक्रिय',
       manageLists: 'सिंगलिस्ट प्रबंधित करें',
+      share: 'इस आरती को शेयर करें',
     },
     sing: {
       title: 'सिंगलिस्ट',
@@ -437,6 +440,7 @@ const T = {
       removedFrom: '{name}ांतल्यान काडली',
       activeBadge: 'सक्रीय',
       manageLists: 'सिंगलिस्ट व्यवस्थापित करात',
+      share: 'ही आरती शेअर करात',
     },
     sing: {
       title: 'सिंगलिस्ट',

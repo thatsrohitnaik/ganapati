@@ -13,14 +13,13 @@ import {
 
 const LANGS = { mr: 'मराठी', hi: 'हिंदी', sa: 'संस्कृत' }
 
-export default function Aarti({ onBack }) {
+export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelectAarti }) {
   const { t } = useI18n()
-  const [deityId, setDeityId] = useState(null)
-  const [aartiId, setAartiId] = useState(null)
   const [target, setTarget] = useState(null)
   const [lists, setLists] = useState([])
   const [newName, setNewName] = useState('')
   const [notice, setNotice] = useState(null)
+  const [shareMsg, setShareMsg] = useState(null)
 
   const deity = data.deities.find((d) => d.id === deityId)
   const aarti = deity?.aartis.find((a) => a.id === aartiId)
@@ -66,11 +65,29 @@ export default function Aarti({ onBack }) {
 
   const activeId = getActiveSinglistId()
 
+  function share() {
+    const url = window.location.origin + window.location.pathname + `#/aarti/${deity.id}/${aarti.id}`
+    const text = `${deity.name} · ${aarti.title} — Ganpati Bappa Morya 🙏`
+    if (navigator.share) {
+      navigator.share({ title: aarti.title, text, url }).catch(() => {})
+    } else if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          setShareMsg(t('sing.copied'))
+          setTimeout(() => setShareMsg(null), 2500)
+        })
+        .catch(() => {})
+    } else {
+      window.prompt(t('sing.copyLink'), url)
+    }
+  }
+
   return (
     <div className="screen aarti-screen">
       <div className="topbar">
         {deity ? (
-          <button className="back-btn" onClick={() => (aarti ? setAartiId(null) : setDeityId(null))}>
+          <button className="back-btn" onClick={() => (aarti ? onSelectAarti(null) : onSelectDeity(null))}>
             ← {aarti ? t('aarti.backList') : t('aarti.backDeities')}
           </button>
         ) : (
@@ -79,7 +96,13 @@ export default function Aarti({ onBack }) {
           </button>
         )}
         <h2>{aarti ? aarti.title : deity ? `${deity.emoji} ${deity.name}` : t('aarti.title')}</h2>
-        <span />
+        {aarti ? (
+          <button className="share-btn" title={t('aarti.share')} onClick={share}>
+            📤
+          </button>
+        ) : (
+          <span />
+        )}
       </div>
 
       {!deity && (
@@ -87,7 +110,7 @@ export default function Aarti({ onBack }) {
           <p className="screen-subtitle">{t('aarti.subtitle')}</p>
           <div className="aarti-deities">
             {data.deities.map((d) => (
-              <button key={d.id} className="deity-card" onClick={() => { setAartiId(null); setDeityId(d.id) }}>
+              <button key={d.id} className="deity-card" onClick={() => onSelectDeity(d.id)}>
                 <span className="deity-emoji">{d.emoji}</span>
                 <span className="deity-name">{d.name}</span>
                 <span className="deity-name-en">{d.nameEn}</span>
@@ -104,7 +127,7 @@ export default function Aarti({ onBack }) {
             const inAny = aartiInAnySinglist(deity.id, a.id)
             return (
               <div key={a.id} className="aarti-row">
-                <button className="aarti-row-main" onClick={() => setAartiId(a.id)}>
+                <button className="aarti-row-main" onClick={() => onSelectAarti(a.id)}>
                   <span className="aarti-row-title">
                     {a.title}
                     {inAny && <span className="in-singlist-dot" title={t('aarti.inSinglist')} />}
@@ -127,6 +150,7 @@ export default function Aarti({ onBack }) {
           <p className="aarti-subtitle">
             {deity.name} · {LANGS[aarti.lang] || aarti.lang}
           </p>
+          {shareMsg && <p className="aarti-share-msg">{shareMsg}</p>}
           <div className="lyric-lines">
             {aarti.lines.map((line, i) =>
               line.trim() ? <p key={i} className="aarti-line">{line}</p> : <div key={i} className="line-gap" />

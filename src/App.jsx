@@ -8,9 +8,12 @@ import Japa from './components/Japa'
 import SinglistScreen from './components/SinglistScreen'
 import SettingsScreen from './components/SettingsScreen'
 import { decodeSinglist, importSinglist, setActiveSinglistId } from './utils/singlists'
+import data from './data/aartis.json'
 
 export default function App() {
   const [view, setView] = useState('home')
+  const [aartiDeity, setAartiDeity] = useState(null)
+  const [aartiId, setAartiId] = useState(null)
   const [toast, setToast] = useState(null)
 
   useEffect(() => {
@@ -18,8 +21,8 @@ export default function App() {
     if (h && h.startsWith('#singlist=')) {
       const code = h.slice('#singlist='.length)
       try {
-        const data = decodeSinglist(code)
-        const sl = importSinglist(data)
+        const d = decodeSinglist(code)
+        const sl = importSinglist(d)
         if (sl) {
           setActiveSinglistId(sl.id)
           setView('singlist')
@@ -29,8 +32,28 @@ export default function App() {
         setToast('Invalid singlist link')
       }
       history.replaceState(null, '', window.location.pathname + window.location.search)
+    } else if (h && h.startsWith('#/aarti')) {
+      const parts = h.replace('#/aarti', '').split('/').filter(Boolean)
+      const deity = data.deities.find((d) => d.id === parts[0])
+      if (deity) {
+        setAartiDeity(deity.id)
+        const a = deity.aartis.find((x) => x.id === parts[1])
+        if (a) setAartiId(a.id)
+        setView('aarti')
+      }
     }
   }, [])
+
+  useEffect(() => {
+    let h = ''
+    if (view === 'aarti' && aartiDeity) {
+      h = `/aarti/${aartiDeity}${aartiId ? `/${aartiId}` : ''}`
+    }
+    const target = h ? `#${h}` : ''
+    if (window.location.hash !== target) {
+      history.replaceState(null, '', window.location.pathname + window.location.search + target)
+    }
+  }, [view, aartiDeity, aartiId])
 
   useEffect(() => {
     if (!toast) return
@@ -38,11 +61,35 @@ export default function App() {
     return () => clearTimeout(t)
   }, [toast])
 
+  function openDeity(id) {
+    setView('aarti')
+    setAartiDeity(id)
+    setAartiId(null)
+  }
+
+  function selectAarti(id) {
+    setAartiId(id)
+  }
+
+  function backHome() {
+    setView('home')
+    setAartiDeity(null)
+    setAartiId(null)
+  }
+
   return (
     <I18nProvider>
       {toast && <div className="toast">{toast}</div>}
       {view === 'quiz' && <Quiz onBack={() => setView('home')} />}
-      {view === 'aarti' && <Aarti onBack={() => setView('home')} />}
+      {view === 'aarti' && (
+        <Aarti
+          onBack={backHome}
+          deityId={aartiDeity}
+          aartiId={aartiId}
+          onSelectDeity={openDeity}
+          onSelectAarti={selectAarti}
+        />
+      )}
       {view === 'japa' && <Japa onBack={() => setView('home')} />}
       {view === 'singlist' && <SinglistScreen onBack={() => setView('home')} />}
       {view === 'settings' && <SettingsScreen onBack={() => setView('home')} />}

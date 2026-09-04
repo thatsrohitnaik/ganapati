@@ -1,11 +1,16 @@
 import { useState } from 'react'
-import questions from '../data/quizQuestions.json'
+import quizQuestions from '../data/quizQuestions.json'
+import Leaderboard, { formatTime } from './Leaderboard'
+import { useI18n } from '../i18n'
+import { clearLeaderboard, getLeaderboard, saveLeaderboardEntry } from '../utils/storage'
 
-const LANGUAGES = [
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'hi', label: 'Hindi', flag: '🇮🇳' },
-  { code: 'kn', label: 'Konkani', flag: '🟨' },
-  { code: 'mr', label: 'Marathi', flag: '🟧' },
+const QUESTIONS_PER_GAME = 10
+const OPT_LETTERS = ['A', 'B', 'C', 'D']
+const LANGS = [
+  { code: 'en', label: 'English' },
+  { code: 'hi', label: 'हिंदी' },
+  { code: 'kn', label: 'कोंकणी' },
+  { code: 'mr', label: 'मराठी' },
 ]
 
 function shuffle(arr) {
@@ -18,127 +23,197 @@ function shuffle(arr) {
 }
 
 export default function Quiz({ onBack }) {
-  const [lang, setLang] = useState('en')
+  const { t } = useI18n()
+  const [stage, setStage] = useState('details')
+  const [name, setName] = useState('')
+  const [qLang, setQLang] = useState('mr')
+  const [questions, setQuestions] = useState([])
+  const [idx, setIdx] = useState(0)
   const [selected, setSelected] = useState(null)
   const [score, setScore] = useState(0)
-  const [answered, setAnswered] = useState(0)
-  const [current, setCurrent] = useState(() => shuffle(questions).slice(0, 10))
+  const [startAt, setStartAt] = useState(0)
+  const [timeSec, setTimeSec] = useState(0)
+  const [entries, setEntries] = useState(getLeaderboard)
+  const [showLb, setShowLb] = useState(true)
+  const [lastId, setLastId] = useState(null)
 
-  const pickNewQuestions = () => {
-    setCurrent(shuffle(questions).slice(0, 10))
-    setSelected(null)
+  const q = questions[idx]
+  const last = idx === questions.length - 1
+
+  function start() {
+    const qs = shuffle(quizQuestions).slice(0, QUESTIONS_PER_GAME)
+    setQuestions(qs)
+    setIdx(0)
     setScore(0)
-    setAnswered(0)
-  }
-
-  const handleAnswer = (idx) => {
-    if (selected !== null) return
-    setSelected(idx)
-    setAnswered((a) => a + 1)
-    if (idx === current[0].answer[lang]) setScore((s) => s + 1)
-  }
-
-  const next = () => {
-    setCurrent((c) => c.slice(1))
     setSelected(null)
+    setStartAt(Date.now())
+    setTimeSec(0)
+    setStage('playing')
   }
 
-  const question = current[0]
-  const correct = question?.answer[lang]
-  const total = 10
-  const progress = ((10 - current.length) / total) * 100
+  function choose(optIdx) {
+    if (selected != null) return
+    setSelected(optIdx)
+    if (q && optIdx === q.answer[qLang]) setScore((s) => s + 1)
+  }
 
-  if (!question) {
-    return (
-      <div className="screen quiz-screen">
-        <div className="topbar">
-          <button className="back-btn" onClick={onBack}>← Home</button>
-          <h2>Quiz Complete</h2>
-          <span />
-        </div>
-        <div className="result-card">
-          <div className="result-score">
-            {score} / {total}
-          </div>
-          <p className="result-msg">
-            {score >= 8 ? '🎉 उत्तम! Ganpati Bappa Morya!' :
-             score >= 5 ? '👍 Good job, keep learning!' :
-             '🙏 Try again, the wisdom of Ganesha awaits!'}
-          </p>
-          <div className="result-actions">
-            <button className="btn-primary" onClick={pickNewQuestions}>
-              Play Again
-            </button>
-            <button className="btn-secondary" onClick={onBack}>Home</button>
-          </div>
-        </div>
-      </div>
-    )
+  function nextOrFinish() {
+    if (last) {
+      const sec = Math.round((Date.now() - startAt) / 1000)
+      const id = saveLeaderboardEntry({
+        name: name.trim() || t('quiz.anonymous'),
+        score,
+        total: questions.length,
+        timeSec: sec,
+        lang: qLang,
+      })
+      setTimeSec(sec)
+      setEntries(getLeaderboard())
+      setLastId(id)
+      setStage('results')
+    } else {
+      setIdx(idx + 1)
+      setSelected(null)
+    }
+  }
+
+  function goHome() {
+    setStage('details')
+    onBack()
   }
 
   return (
     <div className="screen quiz-screen">
-      <div className="topbar">
-        <button className="back-btn" onClick={onBack}>← Home</button>
-        <h2>📝 Ganpati Quiz</h2>
-        <span className="score-pill">⭐ {score}</span>
-      </div>
+      {stage === 'details' && (
+        <>
+          <div className="topbar">
+            <button className="back-btn" onClick={onBack}>← {t('common.home')}</button>
+            <h2>{t('quiz.title')}</h2>
+            <span />
+          </div>
 
-      <div className="lang-selector">
-        {LANGUAGES.map((l) => (
-          <button
-            key={l.code}
-            className={`lang-btn ${lang === l.code ? 'active' : ''}`}
-            onClick={() => { setLang(l.code); setSelected(null) }}
-          >
-            {l.flag} {l.label}
-          </button>
-        ))}
-      </div>
+          <div className="details-card">
+            <p className="details-title">{t('quiz.detailsTitle')}</p>
+            <input
+              className="name-input"
+              value={name}
+              placeholder={t('quiz.namePlaceholder')}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <p className="details-hint">{t('quiz.qLang')}</p>
+            <div className="lang-selector">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  className={`lang-btn ${qLang === l.code ? 'active' : ''}`}
+                  onClick={() => setQLang(l.code)}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+            <button className="btn-primary start-btn" onClick={start}>
+              {t('quiz.start')}
+            </button>
 
-      <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${progress}%` }} />
-      </div>
-
-      <div className="question-card">
-        <p className="q-count">
-          Question {10 - current.length + 1} of {total}
-        </p>
-        <h3 className="q-text">{question.question[lang]}</h3>
-
-        <div className="options">
-          {question.options[lang].map((opt, i) => {
-            let cls = 'option'
-            if (selected !== null && i === correct) cls += ' correct'
-            if (selected === i && i !== correct) cls += ' wrong'
-            if (selected !== null && i !== correct) cls += ' dim'
-            return (
-              <button
-                key={i}
-                className={cls}
-                onClick={() => handleAnswer(i)}
-                disabled={selected !== null}
-              >
-                <span className="opt-letter">{String.fromCharCode(65 + i)}.</span>
-                {opt}
-              </button>
-            )
-          })}
-        </div>
-
-        {selected !== null && (
-          <div className="feedback">
-            {selected === correct
-              ? <span className="fb-correct">✅ Correct! Great job!</span>
-              : <span className="fb-wrong">❌ Incorrect! Correct answer: {String.fromCharCode(65 + correct)}</span>}
-            {current.length > 1 ? (
-              <button className="btn-primary" onClick={next}>Next →</button>
-            ) : (
-              <button className="btn-primary" onClick={next}>See Results 🏁</button>
+            {entries.length > 0 && (
+              <div className="lb-section">
+                <button className="lb-toggle" onClick={() => setShowLb((s) => !s)}>
+                  {t('quiz.leaderboard')} {showLb ? '▲' : '▼'}
+                </button>
+                {showLb && (
+                  <>
+                    <Leaderboard entries={entries} />
+                    <button className="btn-secondary lb-clear" onClick={() => { clearLeaderboard(); setEntries([]) }}>
+                      {t('lb.clear')}
+                    </button>
+                  </>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
+        </>
+      )}
+
+      {stage === 'playing' && q && (
+        <>
+          <div className="topbar">
+            <button className="back-btn" onClick={() => setStage('details')}>←</button>
+            <h2>{t('quiz.title')}</h2>
+            <span className="score-pill">⭐ {score}</span>
+          </div>
+
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${((idx + 1) / questions.length) * 100}%` }} />
+          </div>
+
+          <p className="q-count">{t('quiz.qCount', { n: idx + 1, total: questions.length })}</p>
+
+          <div className="question-card">
+            <p className="q-text">{q.question[qLang]}</p>
+            <div className="options">
+              {q.options[qLang].map((opt, i) => {
+                let cls = 'option'
+                if (selected != null) {
+                  if (i === q.answer[qLang]) cls += ' correct'
+                  else if (i === selected) cls += ' wrong'
+                  else cls += ' dim'
+                }
+                return (
+                  <button key={i} className={cls} disabled={selected != null} onClick={() => choose(i)}>
+                    <span className="opt-letter">{OPT_LETTERS[i]}</span>
+                    <span>{opt}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {selected != null && (
+              <div className="feedback">
+                {selected === q.answer[qLang] ? (
+                  <div className="fb-correct">{t('quiz.correct')}</div>
+                ) : (
+                  <div className="fb-wrong">
+                    {t('quiz.wrong', { letter: OPT_LETTERS[q.answer[qLang]] })}
+                  </div>
+                )}
+                <button className="btn-primary" onClick={nextOrFinish}>
+                  {last ? t('quiz.seeResults') : t('quiz.next')}
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {stage === 'results' && (
+        <>
+          <div className="topbar">
+            <button className="back-btn" onClick={goHome}>← {t('common.home')}</button>
+            <h2>{t('quiz.resultsTitle')}</h2>
+            <span className="score-pill">⭐ {score}/{questions.length}</span>
+          </div>
+
+          <div className="result-card">
+            <div className="result-score">{score}/{questions.length}</div>
+            <p className="result-msg">
+              {score >= 8 ? t('quiz.msgGreat') : score >= 5 ? t('quiz.msgGood') : t('quiz.msgTry')}
+            </p>
+            <p className="result-time">⏱️ {t('quiz.timeTaken')} {formatTime(timeSec)}</p>
+            <div className="result-actions">
+              <button className="btn-primary" onClick={start}>{t('quiz.playAgain')}</button>
+              <button className="btn-secondary" onClick={goHome}>{t('common.home')}</button>
+            </div>
+          </div>
+
+          {entries.length > 0 && (
+            <div className="lb-section result-lb">
+              <h3>{t('lb.title')}</h3>
+              <Leaderboard entries={entries} highlightId={lastId} />
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

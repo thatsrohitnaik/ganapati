@@ -1,5 +1,6 @@
 import { useI18n, LANG_META } from './../i18n'
 import { useAppStore, SPACING_PRESETS, FONT_SIZE } from './../store/appStore'
+import pkg from '../../package.json'
 
 export default function SettingsScreen({ onBack }) {
   const { lang, setLang, t } = useI18n()

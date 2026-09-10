@@ -1,6 +1,51 @@
 const KEY = 'ganpati-singlists'
 const ACTIVE_KEY = 'ganpati-active-singlist'
 
+const SAMPLE_ID = 'sl-sample'
+
+const SAMPLE_ITEMS = [
+  {
+    deityId: 'ganapati',
+    deityName: 'गणपती',
+    aartiId: 'ganapati-sukhkarta-short',
+    title: 'सुखकर्ता दुःखहर्ता',
+    subtitle: 'गणपती आरती (संक्षिप्त ३ कडवी)',
+    lang: 'mr',
+  },
+  {
+    deityId: 'shankar',
+    deityName: 'शंकर',
+    aartiId: 'shankar-yei-deva',
+    title: 'लवथवती विक्राळा',
+    subtitle: 'शिव आरती (समर्थ रामदास)',
+    lang: 'mr',
+  },
+  {
+    deityId: 'durga',
+    deityName: 'दुर्गा',
+    aartiId: 'durga-durghat-bhari',
+    title: 'दुर्गे दुर्घट भारी',
+    subtitle: 'दुर्गा आरती (मराठी)',
+    lang: 'mr',
+  },
+  {
+    deityId: 'ganapati',
+    deityName: 'गणपती',
+    aartiId: 'ganapati-ghalin-lotangan',
+    title: 'घालीन लोटांगण',
+    subtitle: 'संत नामदेव (पूजन समर्पण)',
+    lang: 'mr',
+  },
+  {
+    deityId: 'ganapati',
+    deityName: 'गणपती',
+    aartiId: 'ganapati-sada-sarvada',
+    title: 'सदा सर्वदा योग तुझा घडावा',
+    subtitle: 'समर्थ रामदासांकृत श्लोक (आरतीनंतरची प्रार्थना)',
+    lang: 'mr',
+  },
+]
+
 function uid(prefix) {
   return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
 }
@@ -32,6 +77,21 @@ export function createSinglist(name, emoji = '🎶') {
   }
   persist([...getSinglists(), sl])
   return sl
+}
+
+export function seedDefaultSinglist() {
+  const list = getSinglists()
+  if (list.some((s) => s.id === SAMPLE_ID)) return
+  const sl = {
+    id: SAMPLE_ID,
+    name: 'Sample Singlist',
+    emoji: '🙏',
+    items: SAMPLE_ITEMS.map((i) => ({ id: uid('it'), ...i })),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  }
+  persist([...list, sl])
+  if (!getActiveSinglist()) setActiveSinglistId(SAMPLE_ID)
 }
 
 export function importSinglist(data) {

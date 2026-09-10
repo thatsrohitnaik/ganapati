@@ -1,21 +1,63 @@
-:root {
-  --saffron: #f5a623;
-  --saffron-dark: #d98d12;
-  --maroon: #a63d2f;
-  --maroon-dark: #7d2c22;
-  --gold: #ffd354;
-  --cream: #fff8ec;
-  --cream-2: #fff3dd;
-  --ink: #3b2b1f;
-  --ink-soft: #6b5340;
-  --green: #2e8b57;
-  --green-dark: #1f6e44;
+@import "tailwindcss";
+
+@theme {
+  /* ===== Palette (new spec) ===== */
+  --color-primary: #e8751a;
+  --color-primary-hover: #c95712;
+  --color-maroon: #6d1f2b;
+  --color-maroon-dark: #57141f;
+  --color-cream: #fff8ed;
+  --color-cream-2: #faf0e0;
+  --color-white: #ffffff;
+  --color-gold: #d6a84f;
+  --color-brown: #3a2922;
+  --color-green: #526b4a;
+  --color-gray: #77716b;
+  --color-border: #e8ded1;
+  --color-danger: #d64545;
+  --color-live: #dc2626;
+
+  /* ===== Semantic aliases ===== */
+  --color-card-bg: #ffffff;
+  --color-text-main: #3a2922;
+  --color-text-muted: #77716b;
+  --color-accent-live: #dc2626;
+
+  /* ===== Legacy aliases used by App.css ===== */
+  --saffron: #e8751a;
+  --saffron-dark: #c95712;
+  --maroon: #6d1f2b;
+  --maroon-dark: #57141f;
+  --gold: #d6a84f;
+  --cream: #fff8ed;
+  --cream-2: #faf0e0;
+  --ink: #3a2922;
+  --ink-soft: #77716b;
+  --green: #526b4a;
+  --green-dark: #405a3a;
   --red: #d64545;
   --white: #ffffff;
 
-  font-family: 'Noto Sans Devanagari', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  /* ===== Shapes ===== */
+  --radius-card: 16px;
+  --radius-btn: 9999px;
+  --radius-pill: 9999px;
+  --border-radius-card: 16px;
+  --border-radius-btn: 9999px;
+
+  /* ===== Shadows ===== */
+  --shadow-card: 0 2px 12px rgba(58, 41, 34, 0.06);
+  --shadow-raised: 0 10px 30px rgba(58, 41, 34, 0.12);
+  --shadow-floating: 0 10px 30px rgba(58, 41, 34, 0.12);
+  --shadow-primary: 0 8px 24px rgba(232, 117, 26, 0.28);
+
+  /* ===== Typography ===== */
+  --font-sans: 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif;
+
+  /* ===== Motion ===== */
+  --transition-fast: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-soft: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 *,
@@ -24,12 +66,23 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  margin: 0;
-  background: linear-gradient(160deg, var(--cream) 0%, var(--cream-2) 100%);
+  background: var(--color-cream);
   min-height: 100vh;
-  color: var(--ink);
+  color: var(--color-brown);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   transition: background 0.3s, color 0.3s;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
 }
 
 h1,
@@ -38,8 +91,28 @@ h3 {
   margin: 0;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
+p {
+  margin: 0;
+}
+
+.dev { font-family: var(--font-serif), var(--font-sans); }
+.dev-serif { font-family: var(--font-serif); }
+
+/* Focus visibility for keyboard users */
+:focus-visible {
+  outline: 3px solid rgba(232, 117, 26, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

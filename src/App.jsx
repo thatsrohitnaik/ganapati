@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { I18nProvider } from './i18n'
+import AppShell from './components/AppShell'
 import Home from './components/Home'
 import Quiz from './components/Quiz'
 import Aarti from './components/Aarti'
 import Japa from './components/Japa'
 import SinglistScreen from './components/SinglistScreen'
 import SettingsScreen from './components/SettingsScreen'
-import { decodeSinglist, importSinglist, setActiveSinglistId } from './utils/singlists'
+import More from './components/More'
+import {
+  decodeSinglist,
+  importSinglist,
+  seedDefaultSinglist,
+  setActiveSinglistId,
+} from './utils/singlists'
 import data from './data/aartis.json'
+
+seedDefaultSinglist()
 
 export default function App() {
   const [view, setView] = useState('home')
@@ -61,6 +70,12 @@ export default function App() {
     return () => clearTimeout(t)
   }, [toast])
 
+  function nav(where) {
+    setView(where)
+    setAartiDeity(null)
+    setAartiId(null)
+  }
+
   function openDeity(id) {
     setView('aarti')
     setAartiDeity(id)
@@ -71,33 +86,46 @@ export default function App() {
     setAartiId(id)
   }
 
+  function openAarti(deityId, id) {
+    setView('aarti')
+    setAartiDeity(deityId)
+    setAartiId(id)
+  }
+
   function backHome() {
     setView('home')
     setAartiDeity(null)
     setAartiId(null)
   }
 
+  function isAartiTabActive() {
+    return view === 'aarti'
+  }
+
   return (
     <I18nProvider>
-      {toast && <div className="toast">{toast}</div>}
-      {view === 'home' && (
-        <Home onSelect={setView} />
-      )}
-      {view === 'quiz' && <Quiz onBack={() => setView('home')} />}
-      {view === 'aarti' && (
-        <Aarti
-          onBack={backHome}
-          deityId={aartiDeity}
-          aartiId={aartiId}
-          onSelectDeity={openDeity}
-          onSelectAarti={selectAarti}
-        />
-      )}
-      {view === 'japa' && <Japa onBack={() => setView('home')} />}
-      {view === 'singlist' && (
-        <SinglistScreen onBack={() => setView('home')} />
-      )}
-      {view === 'settings' && <SettingsScreen onBack={() => setView('home')} />}
+      <AppShell view={isAartiTabActive() ? 'aarti' : view} onNav={nav} onSettings={() => nav('settings')}>
+        {toast && <div className="toast">{toast}</div>}
+        {view === 'home' && (
+          <Home onSelect={nav} onOpenAarti={openAarti} />
+        )}
+        {view === 'quiz' && <Quiz onBack={backHome} />}
+        {view === 'aarti' && (
+          <Aarti
+            onBack={backHome}
+            deityId={aartiDeity}
+            aartiId={aartiId}
+            onSelectDeity={openDeity}
+            onSelectAarti={selectAarti}
+          />
+        )}
+        {view === 'japa' && <Japa onBack={() => setView('more')} />}
+        {view === 'singlist' && (
+          <SinglistScreen onBack={backHome} />
+        )}
+        {view === 'settings' && <SettingsScreen onBack={() => setView('more')} />}
+        {view === 'more' && <More onSelect={nav} />}
+      </AppShell>
     </I18nProvider>
   )
 }

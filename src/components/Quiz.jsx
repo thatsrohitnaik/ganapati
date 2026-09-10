@@ -22,6 +22,16 @@ function shuffle(arr) {
   return a
 }
 
+function prepare(q, lang) {
+  const order = shuffle(q.options[lang].map((_, i) => i))
+  return {
+    id: q.id,
+    question: q.question,
+    options: order.map((i) => q.options[lang][i]),
+    answer: order.indexOf(q.answer[lang]),
+  }
+}
+
 export default function Quiz({ onBack }) {
   const { t } = useI18n()
   const [stage, setStage] = useState('details')
@@ -41,7 +51,7 @@ export default function Quiz({ onBack }) {
   const last = idx === questions.length - 1
 
   function start() {
-    const qs = shuffle(quizQuestions).slice(0, QUESTIONS_PER_GAME)
+    const qs = shuffle(quizQuestions).slice(0, QUESTIONS_PER_GAME).map((qq) => prepare(qq, qLang))
     setQuestions(qs)
     setIdx(0)
     setScore(0)
@@ -54,7 +64,7 @@ export default function Quiz({ onBack }) {
   function choose(optIdx) {
     if (selected != null) return
     setSelected(optIdx)
-    if (q && optIdx === q.answer[qLang]) setScore((s) => s + 1)
+    if (q && optIdx === q.answer) setScore((s) => s + 1)
   }
 
   function nextOrFinish() {
@@ -152,10 +162,10 @@ export default function Quiz({ onBack }) {
           <div className="question-card">
             <p className="q-text">{q.question[qLang]}</p>
             <div className="options">
-              {q.options[qLang].map((opt, i) => {
+              {q.options.map((opt, i) => {
                 let cls = 'option'
                 if (selected != null) {
-                  if (i === q.answer[qLang]) cls += ' correct'
+                  if (i === q.answer) cls += ' correct'
                   else if (i === selected) cls += ' wrong'
                   else cls += ' dim'
                 }
@@ -170,11 +180,11 @@ export default function Quiz({ onBack }) {
 
             {selected != null && (
               <div className="feedback">
-                {selected === q.answer[qLang] ? (
+                {selected === q.answer ? (
                   <div className="fb-correct">{t('quiz.correct')}</div>
                 ) : (
                   <div className="fb-wrong">
-                    {t('quiz.wrong', { letter: OPT_LETTERS[q.answer[qLang]] })}
+                    {t('quiz.wrong', { letter: OPT_LETTERS[q.answer] })}
                   </div>
                 )}
                 <button className="btn-primary" onClick={nextOrFinish}>

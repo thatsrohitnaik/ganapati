@@ -13,7 +13,7 @@
   --red: #d64545;
   --white: #ffffff;
 
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Noto Sans Devanagari', 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -29,6 +29,7 @@ body {
   background: linear-gradient(160deg, var(--cream) 0%, var(--cream-2) 100%);
   min-height: 100vh;
   color: var(--ink);
+  transition: background 0.3s, color 0.3s;
 }
 
 h1,

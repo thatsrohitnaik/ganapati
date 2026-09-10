@@ -21,6 +21,7 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
   const [notice, setNotice] = useState(null)
   const [shareMsg, setShareMsg] = useState(null)
   const [shareOpen, setShareOpen] = useState(false)
+  const [langFilter, setLangFilter] = useState(null)
 
   const deity = data.deities.find((d) => d.id === deityId)
   const aarti = deity?.aartis.find((a) => a.id === aartiId)
@@ -147,27 +148,45 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
       )}
 
       {deity && !aarti && (
-        <div className="aarti-items">
-          {deity.aartis.map((a) => {
-            const inAny = aartiInAnySinglist(deity.id, a.id)
-            return (
-              <div key={a.id} className="aarti-row">
-                <button className="aarti-row-main" onClick={() => onSelectAarti(a.id)}>
-                  <span className="aarti-row-title">
-                    {a.title}
-                    {inAny && <span className="in-singlist-dot" title={t('aarti.inSinglist')} />}
-                  </span>
-                  <span className="aarti-row-sub">
-                    {a.subtitle} · <span className="lang-badge">{LANGS[a.lang] || a.lang}</span>
-                  </span>
-                </button>
-                <button className="add-btn" title={t('aarti.addHint')} onClick={() => openPicker(deity, a)}>
-                  ＋
-                </button>
-              </div>
-            )
-          })}
-        </div>
+        <>
+          <div className="lang-filter">
+            <button
+              className={`lang-chip ${langFilter === null ? 'on' : ''}`}
+              onClick={() => setLangFilter(null)}
+            >All</button>
+            {Object.entries(LANGS).map(([code, label]) => {
+              const count = deity.aartis.filter((a) => a.lang === code).length
+              if (count === 0) return null
+              return (
+                <button
+                  key={code}
+                  className={`lang-chip ${langFilter === code ? 'on' : ''}`}
+                  onClick={() => setLangFilter(langFilter === code ? null : code)}
+                >{label} ({count})</button>
+              )
+            })}
+          </div>
+          <div className="aarti-items">
+            {deity.aartis
+              .filter((a) => !langFilter || a.lang === langFilter)
+              .map((a) => {
+                const inAny = aartiInAnySinglist(deity.id, a.id)
+                return (
+                  <div key={a.id} className="aarti-row">
+                    <button className="aarti-row-main" onClick={() => onSelectAarti(a.id)}>
+                      <span className="aarti-row-title">
+                        {a.title}
+                        {inAny && <span className="in-singlist-dot" title={t('aarti.inSinglist')} />}
+                      </span>
+                      <span className="aarti-row-sub">
+                        {a.subtitle} · <span className="lang-badge">{LANGS[a.lang] || a.lang}</span>
+                      </span>
+                    </button>
+                  </div>
+                )
+              })}
+          </div>
+        </>
       )}
 
       {deity && aarti && (
@@ -175,15 +194,15 @@ export default function Aarti({ onBack, deityId, aartiId, onSelectDeity, onSelec
           <p className="aarti-subtitle">
             {deity.name} · {LANGS[aarti.lang] || aarti.lang}
           </p>
+          <button className="btn-primary add-cta" onClick={() => openPicker(deity, aarti)}>
+            {t('aarti.addTo')}
+          </button>
           {shareMsg && <p className="aarti-share-msg">{shareMsg}</p>}
           <div className="lyric-lines">
             {aarti.lines.map((line, i) =>
               line.trim() ? <p key={i} className="aarti-line">{line}</p> : <div key={i} className="line-gap" />
             )}
           </div>
-          <button className="btn-primary add-cta" onClick={() => openPicker(deity, aarti)}>
-            {t('aarti.addTo')}
-          </button>
         </div>
       )}
 

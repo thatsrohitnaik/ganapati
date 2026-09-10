@@ -26,7 +26,7 @@ export default function App() {
         if (sl) {
           setActiveSinglistId(sl.id)
           setView('singlist')
-          setToast(`Imported singlist “${sl.name}”`)
+          setToast(`Imported singlist "${sl.name}"`)
         }
       } catch {
         setToast('Invalid singlist link')
@@ -80,6 +80,9 @@ export default function App() {
   return (
     <I18nProvider>
       {toast && <div className="toast">{toast}</div>}
+      {view === 'home' && (
+        <Home onSelect={setView} />
+      )}
       {view === 'quiz' && <Quiz onBack={() => setView('home')} />}
       {view === 'aarti' && (
         <Aarti
@@ -91,9 +94,10 @@ export default function App() {
         />
       )}
       {view === 'japa' && <Japa onBack={() => setView('home')} />}
-      {view === 'singlist' && <SinglistScreen onBack={() => setView('home')} />}
+      {view === 'singlist' && (
+        <SinglistScreen onBack={() => setView('home')} />
+      )}
       {view === 'settings' && <SettingsScreen onBack={() => setView('home')} />}
-      {view === 'home' && <Home onSelect={setView} />}
     </I18nProvider>
   )
 }

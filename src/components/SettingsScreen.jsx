@@ -63,6 +63,8 @@ export default function SettingsScreen({ onBack }) {
           ))}
         </div>
       </div>
+
+      <p className="app-version">v{pkg.version}</p>
     </div>
   )
 }

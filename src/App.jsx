@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { I18nProvider } from './i18n'
 import AppShell from './components/AppShell'
 import Home from './components/Home'
 import Quiz from './components/Quiz'
@@ -9,6 +8,7 @@ import Japa from './components/Japa'
 import SinglistScreen from './components/SinglistScreen'
 import SettingsScreen from './components/SettingsScreen'
 import More from './components/More'
+import { useAppStore, SPACING_PRESETS } from './store/appStore'
 import {
   decodeSinglist,
   importSinglist,
@@ -24,6 +24,25 @@ export default function App() {
   const [aartiDeity, setAartiDeity] = useState(null)
   const [aartiId, setAartiId] = useState(null)
   const [toast, setToast] = useState(null)
+
+  const fontSize = useAppStore((s) => s.fontSize)
+  const spacingMode = useAppStore((s) => s.spacingMode)
+
+  useEffect(() => {
+    const spacing = SPACING_PRESETS[spacingMode] || SPACING_PRESETS.normal
+    const scope = document.documentElement.style
+    scope.setProperty('--fs-lyrics', `${fontSize}px`)
+    scope.setProperty('--fs-lyrics-lh', String(spacing.lineHeight))
+    scope.setProperty('--fs-lyrics-ws', spacing.wordSpacing)
+  }, [fontSize, spacingMode])
+
+  useEffect(() => {
+    try {
+      localStorage.removeItem('ganpati-ui-lang')
+    } catch {
+      /* ignore */
+    }
+  }, [])
 
   useEffect(() => {
     const h = window.location.hash
@@ -103,29 +122,27 @@ export default function App() {
   }
 
   return (
-    <I18nProvider>
-      <AppShell view={isAartiTabActive() ? 'aarti' : view} onNav={nav} onSettings={() => nav('settings')}>
-        {toast && <div className="toast">{toast}</div>}
-        {view === 'home' && (
-          <Home onSelect={nav} onOpenAarti={openAarti} />
-        )}
-        {view === 'quiz' && <Quiz onBack={backHome} />}
-        {view === 'aarti' && (
-          <Aarti
-            onBack={backHome}
-            deityId={aartiDeity}
-            aartiId={aartiId}
-            onSelectDeity={openDeity}
-            onSelectAarti={selectAarti}
-          />
-        )}
-        {view === 'japa' && <Japa onBack={() => setView('more')} />}
-        {view === 'singlist' && (
-          <SinglistScreen onBack={backHome} />
-        )}
-        {view === 'settings' && <SettingsScreen onBack={() => setView('more')} />}
-        {view === 'more' && <More onSelect={nav} />}
-      </AppShell>
-    </I18nProvider>
+    <AppShell view={isAartiTabActive() ? 'aarti' : view} onNav={nav} onSettings={() => nav('settings')}>
+      {toast && <div className="toast">{toast}</div>}
+      {view === 'home' && (
+        <Home onSelect={nav} onOpenAarti={openAarti} />
+      )}
+      {view === 'quiz' && <Quiz onBack={backHome} />}
+      {view === 'aarti' && (
+        <Aarti
+          onBack={backHome}
+          deityId={aartiDeity}
+          aartiId={aartiId}
+          onSelectDeity={openDeity}
+          onSelectAarti={selectAarti}
+        />
+      )}
+      {view === 'japa' && <Japa onBack={() => setView('more')} />}
+      {view === 'singlist' && (
+        <SinglistScreen onBack={backHome} />
+      )}
+      {view === 'settings' && <SettingsScreen onBack={() => setView('more')} />}
+      {view === 'more' && <More onSelect={nav} />}
+    </AppShell>
   )
 }

@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-
-const KEY = 'ganpati-ui-lang'
+import { useMemo } from 'react'
+import { useAppStore } from './store/appStore'
 
 export const LANG_META = {
   en: { label: 'English', flag: '🇬🇧' },
@@ -154,9 +153,18 @@ const T = {
     },
     settings: {
       title: 'Settings',
-      subtitle: 'App language',
+      subtitle: 'App language & reading preferences',
       uiLang: 'App language',
       hint: 'Choose the language for the app interface. This does not change the quiz questions — those can be chosen separately.',
+      reading: 'Reading',
+      fontSizeHint: 'Text size for aarti lyrics',
+      spacingHint: 'Line & word spacing',
+      small: 'Small',
+      medium: 'Medium',
+      large: 'Large',
+      compact: 'Compact',
+      normal: 'Normal',
+      relaxed: 'Relaxed',
     },
   japa: {
       title: 'Japa Mala',
@@ -316,9 +324,18 @@ const T = {
     },
     settings: {
       title: 'सेटिंग्ज',
-      subtitle: 'अॅपची भाषा',
+      subtitle: 'अॅपची भाषा व वाचन प्राधान्ये',
       uiLang: 'अॅपची भाषा',
       hint: 'अॅप इंटरफेसची भाषा निवडा. यामुळे क्विझचे प्रश्न बदलत नाहीत — ते स्वतंत्रपणे निवडता येतात.',
+      reading: 'वाचन',
+      fontSizeHint: 'आरती मजकुराचा आकार',
+      spacingHint: 'ओळी व शब्दांमधील अंतर',
+      small: 'लहान',
+      medium: 'मध्यम',
+      large: 'मोठे',
+      compact: 'आवळीत',
+      normal: 'सामान्य',
+      relaxed: 'आरामदायी',
     },
   japa: {
       title: 'जप माला',
@@ -478,9 +495,18 @@ const T = {
     },
     settings: {
       title: 'सेटिंग्स',
-      subtitle: 'ऐप की भाषा',
+      subtitle: 'ऐप की भाषा और पढ़ने की प्राथमिकताएँ',
       uiLang: 'ऐप की भाषा',
       hint: 'ऐप इंटरफ़ेस की भाषा चुनें। इससे क्विज़ के प्रश्न नहीं बदलते — उन्हें अलग से चुना जा सकता है।',
+      reading: 'पढ़ना',
+      fontSizeHint: 'आरती के पाठ का आकार',
+      spacingHint: 'पंक्ति और शब्दों की दूरी',
+      small: 'छोटा',
+      medium: 'मध्यम',
+      large: 'बड़ा',
+      compact: 'कम्पैक्ट',
+      normal: 'सामान्य',
+      relaxed: 'आरामदायक',
     },
   japa: {
       title: 'जप माला',
@@ -640,9 +666,18 @@ const T = {
     },
     settings: {
       title: 'सेटिंग्ज',
-      subtitle: 'अॅपाची भास',
+      subtitle: 'अॅपाची भास आणि वाचपाचीं प्राधान्यां',
       uiLang: 'अॅपाची भास',
       hint: 'अॅप इंटरफेसची भास निवडात. हाका लागून क्विझचे प्रश्न बदलतात न्हय — ते स्वतंत्रपणे निवडता येतात.',
+      reading: 'वाचप',
+      fontSizeHint: 'आरती पाठाचो आकार',
+      spacingHint: 'ओळ आणि शब्दांचें अंतर',
+      small: 'ल्हान',
+      medium: 'मध्यम',
+      large: 'व्हड',
+      compact: 'आवळील्लें',
+      normal: 'सामान्य',
+      relaxed: 'आरामदायी',
     },
   japa: {
       title: 'जप माळ',
@@ -665,47 +700,23 @@ function resolve(dict, key) {
   return key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), dict)
 }
 
-const I18nCtx = createContext(null)
+export function useI18n() {
+  const lang = useAppStore((s) => s.lang)
+  const setLang = useAppStore((s) => s.setLang)
 
-export function I18nProvider({ children }) {
-  const [lang, setLang] = useState(() => {
-    try {
-      const saved = localStorage.getItem(KEY)
-      return saved && LANG_META[saved] ? saved : 'mr'
-    } catch {
-      return 'mr'
-    }
-  })
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(KEY, lang)
-    } catch {
-      /* ignore */
+  const t = useMemo(() => {
+    return (key, vars) => {
+      let s = resolve(T[lang], key)
+      if (s === undefined) s = resolve(T.en, key)
+      if (s === undefined) return key
+      if (vars) {
+        for (const [k, v] of Object.entries(vars)) {
+          s = s.replaceAll(`{${k}}`, String(v))
+        }
+      }
+      return s
     }
   }, [lang])
 
-  const t = (key, vars) => {
-    let s = resolve(T[lang], key)
-    if (s === undefined) s = resolve(T.en, key)
-    if (s === undefined) return key
-    if (vars) {
-      for (const [k, v] of Object.entries(vars)) {
-        s = s.replaceAll(`{${k}}`, String(v))
-      }
-    }
-    return s
-  }
-
-  return (
-    <I18nCtx.Provider value={{ lang, setLang, t, meta: LANG_META[lang] }}>
-      {children}
-    </I18nCtx.Provider>
-  )
-}
-
-export function useI18n() {
-  const ctx = useContext(I18nCtx)
-  if (!ctx) throw new Error('useI18n must be used within I18nProvider')
-  return ctx
+  return { lang, setLang, t, meta: LANG_META[lang] }
 }

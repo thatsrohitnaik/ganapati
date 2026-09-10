@@ -68,6 +68,9 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  --fs-lyrics: 19px;
+  --fs-lyrics-lh: 1.9;
+  --fs-lyrics-ws: 1px;
 }
 
 body {

@@ -16,6 +16,7 @@ import {
   singlistShareUrl,
 } from '../utils/singlists'
 import { useI18n } from '../i18n'
+import { useAppStore, SPACING_PRESETS, FONT_SIZE } from '../store/appStore'
 
 const LANGS_LABEL = { mr: 'मराठी', hi: 'हिंदी', sa: 'संस्कृत' }
 
@@ -24,6 +25,8 @@ const toDevanagariDigit = (num) => {
   const digits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९']
   return String(num).replace(/\d/g, (d) => digits[d])
 }
+
+// Line Spacing Presets (defined in store/appStore.js)
 
 export default function SinglistScreen({ onBack }) {
   const { t } = useI18n()
@@ -395,8 +398,11 @@ function SinglistDetailView({ detail, t, onBack, onPlay, onMove, onRemove, onCle
 function SingPlayer({ singlist, onExit, initialIndex = 0 }) {
   const { t } = useI18n()
   const [idx, setIdx] = useState(Math.max(0, Math.min(initialIndex, singlist.items.length - 1)))
-  // Configurable Font Size for Low-Light/Distance Reading (Range: 16px to 24px)
-  const [fontSize, setFontSize] = useState(19)
+
+  const fontSize = useAppStore((s) => s.fontSize)
+  const setFontSize = useAppStore((s) => s.setFontSize)
+  const spacingMode = useAppStore((s) => s.spacingMode)
+  const setSpacingMode = useAppStore((s) => s.setSpacingMode)
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -446,33 +452,53 @@ function SingPlayer({ singlist, onExit, initialIndex = 0 }) {
     else setIdx((i) => i + 1)
   }
 
+  // Cycle line spacing mode between 'compact', 'normal', and 'relaxed'
+  const toggleSpacing = () => {
+    const modes = Object.keys(SPACING_PRESETS)
+    const nextIdx = (modes.indexOf(spacingMode) + 1) % modes.length
+    setSpacingMode(modes[nextIdx])
+  }
+
+  const currentSpacing = SPACING_PRESETS[spacingMode]
+
   return (
       <div className="mx-auto max-w-2xl space-y-4 pb-16">
-        {/* Header Bar with Text Resizer Controls */}
+        {/* Header Bar with Text Resizer & Line Spacing Controls */}
         <div className="flex items-center justify-between border-b border-border/60 pb-3">
           <button className="text-sm font-semibold text-gray-600 hover:text-brown" onClick={onExit}>
             ← {t('sing.title')}
           </button>
-          <h2 className="text-sm font-bold text-brown truncate max-w-[180px]">▶ {singlist.name}</h2>
+          <h2 className="text-sm font-bold text-brown truncate max-w-[140px]">▶ {singlist.name}</h2>
 
-          {/* Dynamic Font Scaler Widget */}
-          <div className="flex items-center gap-1 rounded-xl bg-amber-100/60 p-1 border border-amber-200/60">
+          <div className="flex items-center gap-1.5">
+            {/* Dynamic Font Scaler Widget */}
+            <div className="flex items-center gap-1 rounded-xl bg-amber-100/60 p-1 border border-amber-200/60">
+              <button
+                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-50 disabled:opacity-40"
+                  disabled={fontSize <= FONT_SIZE.min}
+                  onClick={() => setFontSize((s) => Math.max(FONT_SIZE.min, s - FONT_SIZE.step))}
+                  title="Decrease Text Size"
+              >
+                A-
+              </button>
+              <span className="px-1 text-[11px] font-bold text-amber-900">{fontSize}px</span>
+              <button
+                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-50 disabled:opacity-40"
+                  disabled={fontSize >= FONT_SIZE.max}
+                  onClick={() => setFontSize((s) => Math.min(FONT_SIZE.max, s + FONT_SIZE.step))}
+                  title="Increase Text Size"
+              >
+                A+
+              </button>
+            </div>
+
+            {/* Line / Word Spacing Mode Toggle Button */}
             <button
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-50 disabled:opacity-40"
-                disabled={fontSize <= 16}
-                onClick={() => setFontSize((s) => Math.max(16, s - 2))}
-                title="Decrease Text Size"
+                className="flex h-9 items-center gap-1 rounded-xl bg-amber-100/60 px-2 py-1 border border-amber-200/60 text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-100 transition-colors"
+                onClick={toggleSpacing}
+                title="Change Word & Line Spacing"
             >
-              A-
-            </button>
-            <span className="px-1 text-[11px] font-bold text-amber-900">{fontSize}px</span>
-            <button
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-50 disabled:opacity-40"
-                disabled={fontSize >= 24}
-                onClick={() => setFontSize((s) => Math.min(24, s + 2))}
-                title="Increase Text Size"
-            >
-              A+
+              ↔️ <span className="hidden sm:inline">{currentSpacing.label}</span>
             </button>
           </div>
         </div>
@@ -501,7 +527,7 @@ function SingPlayer({ singlist, onExit, initialIndex = 0 }) {
                 </div>
               </div>
 
-              {/* Optimized Devanagari Reading Card */}
+              {/* Optimized Devanagari Reading Card with Customizable Font & Word Spacing */}
               <article
                   className="rounded-3xl border border-amber-200/80 bg-[#FFFDF7] p-5 sm:p-7 shadow-sm space-y-6"
                   style={{ fontFamily: "'Noto Serif Devanagari', 'Mukta', 'Mangal', serif" }}
@@ -529,10 +555,11 @@ function SingPlayer({ singlist, onExit, initialIndex = 0 }) {
                             {stanza.map((line, lIdx) => (
                                 <p
                                     key={lIdx}
-                                    className="font-semibold text-[#2C1D11] tracking-wide"
+                                    className="font-semibold text-[#2C1D11] tracking-wide transition-all"
                                     style={{
                                       fontSize: `${fontSize}px`,
-                                      lineHeight: 1.9,
+                                      lineHeight: currentSpacing.lineHeight,
+                                      wordSpacing: currentSpacing.wordSpacing,
                                     }}
                                 >
                                   {line}
@@ -568,11 +595,13 @@ function SingPlayer({ singlist, onExit, initialIndex = 0 }) {
   )
 }
 
-// Sub-component: Share Dialog Modal
+// Sub-component: Share Dialog Modal with WhatsApp & Clean Copy Buttons
 function ShareSheet({ singlist, onClose }) {
   const { t } = useI18n()
   const [copied, setCopied] = useState('')
+
   const code = encodeSinglist(singlist)
+  const shareUrl = singlistShareUrl(singlist)
 
   const copy = (text, kind) => {
     navigator.clipboard?.writeText(text).then(
@@ -581,31 +610,50 @@ function ShareSheet({ singlist, onClose }) {
     )
   }
 
+  const shareWhatsApp = () => {
+    const text = `🎶 *${singlist.name}* (${singlist.items.length} Aartis)\n\nJoin and sing along using this link:\n${shareUrl}\n\nOr import with code: \`${code}\``
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+    onClose()
+  }
+
   return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs" onClick={onClose}>
         <div
-            className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl space-y-3"
+            className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl space-y-4 text-center"
             onClick={(e) => e.stopPropagation()}
         >
-          <h3 className="text-base font-bold text-brown">🔗 {t('sing.shareTitle')}</h3>
-          <p className="text-xs text-gray-500">{t('sing.shareHint')}</p>
-
-          <div className="rounded-xl bg-cream p-2.5 text-center font-mono text-xs text-brown break-all">
-            {code}
+          <div className="flex items-center justify-between border-b border-border/60 pb-2">
+            <h3 className="text-base font-bold text-brown">🔗 {t('sing.shareTitle')}</h3>
+            <button className="text-sm font-bold text-gray-400 hover:text-brown" onClick={onClose}>✕</button>
           </div>
 
-          <div className="flex gap-2 pt-1">
+          <p className="text-xs font-medium text-gray-600">
+            Share <strong className="text-brown">{singlist.name}</strong> with friends and family so they can sing along.
+          </p>
+
+          <div className="flex flex-col gap-2 pt-1">
+            {/* Direct WhatsApp Share Button */}
             <button
-                className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-bold text-white shadow-sm"
+                className="flex items-center justify-center gap-2 w-full rounded-xl bg-green-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-green-700 active:scale-95 transition-all"
+                onClick={shareWhatsApp}
+            >
+              💬 {t('aarti.shareWhatsapp') || 'Share via WhatsApp'}
+            </button>
+
+            {/* Clean Copy Link */}
+            <button
+                className="w-full rounded-xl border border-border py-2.5 text-xs font-bold text-brown hover:bg-cream active:scale-95 transition-all"
+                onClick={() => copy(shareUrl, 'link')}
+            >
+              {copied === 'link' ? `✓ ${t('sing.copied')}` : `🔗 ${t('sing.copyLink')}`}
+            </button>
+
+            {/* Hidden/Clean Copy Code Option */}
+            <button
+                className="w-full rounded-xl border border-border bg-gray-50 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-100 active:scale-95 transition-all"
                 onClick={() => copy(code, 'code')}
             >
-              {copied === 'code' ? t('sing.copied') : t('sing.copyCode')}
-            </button>
-            <button
-                className="flex-1 rounded-xl border border-border py-2.5 text-xs font-bold text-brown"
-                onClick={() => copy(singlistShareUrl(singlist), 'link')}
-            >
-              {copied === 'link' ? t('sing.copied') : t('sing.copyLink')}
+              {copied === 'code' ? `✓ ${t('sing.copied')}` : `📋 ${t('sing.copyCode')}`}
             </button>
           </div>
 

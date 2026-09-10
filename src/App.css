@@ -670,7 +670,8 @@
 
 .aarti-line {
   font-size: var(--fs-lyrics);
-  line-height: 1.9;
+  line-height: var(--fs-lyrics-lh);
+  word-spacing: var(--fs-lyrics-ws);
   color: var(--ink);
   text-align: center;
   margin: 0;
